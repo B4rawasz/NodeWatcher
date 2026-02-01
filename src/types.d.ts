@@ -1,3 +1,5 @@
+import type { IpcMainToRenderer, IpcRendererInvoke } from "./shared/ipc";
+
 namespace messages {
 	enum MessageType {
 		UNKNOWN = "UNKNOWN",
@@ -71,8 +73,18 @@ namespace messages {
 	}
 }
 
-interface Window {
-	electron: {
-		subCallback: (callback: (data: any) => void) => void;
-	};
+declare global {
+	interface Window {
+		electron: {
+			on<K extends keyof IpcMainToRenderer>(channel: K, cb: (data: IpcMainToRenderer[K]) => void): void;
+
+			send<K extends keyof IpcRendererSend>(channel: K, data: IpcRendererSend[K]): void;
+
+			invoke<K extends keyof IpcRendererInvoke>(
+				channel: K,
+				data: IpcRendererInvoke[K]["request"]
+			): Promise<IpcRendererInvoke[K]["response"]>;
+		};
+	}
 }
+export {};
