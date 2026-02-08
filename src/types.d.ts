@@ -1,4 +1,4 @@
-import type { IpcMainToRenderer, IpcRendererInvoke } from "./shared/ipc";
+import type { AnyUiTaskReq, AnyUiTaskRes } from "./shared/tasks";
 
 namespace messages {
 	enum MessageType {
@@ -12,6 +12,7 @@ namespace messages {
 		CPU_INFO_STATIC = "CPU_INFO_STATIC",
 		CPU_INFO = "CPU_INFO",
 	}
+
 	export interface Message {
 		type: MessageType;
 	}
@@ -76,14 +77,8 @@ namespace messages {
 declare global {
 	interface Window {
 		electron: {
-			on<K extends keyof IpcMainToRenderer>(channel: K, cb: (data: IpcMainToRenderer[K]) => void): void;
-
-			send<K extends keyof IpcRendererSend>(channel: K, data: IpcRendererSend[K]): void;
-
-			invoke<K extends keyof IpcRendererInvoke>(
-				channel: K,
-				data: IpcRendererInvoke[K]["request"]
-			): Promise<IpcRendererInvoke[K]["response"]>;
+			onTask(callback: (req: AnyUiTaskReq) => void): void;
+			sendTaskResponse(res: AnyUiTaskRes): void;
 		};
 	}
 }

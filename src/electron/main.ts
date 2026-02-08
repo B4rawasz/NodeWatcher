@@ -6,6 +6,8 @@ import crypto from "crypto";
 import { getPreloadPath } from "./utils/pathResolver.js";
 import { isDev } from "./utils/utils.js";
 import WebSocketClient from "./modules/websocket/client.js";
+import { IPC } from "../shared/ipc.js";
+import { UiTaskReq } from "../shared/tasks.js";
 
 app.on("ready", () => {
 	const mainWindow = new BrowserWindow({
@@ -19,26 +21,20 @@ app.on("ready", () => {
 		mainWindow.loadFile(path.join(app.getAppPath(), "dist-react", "index.html"));
 	}
 
-	ipcMain.on("ui-log", (event, data) => {
-		console.log("UILOG" + data);
+	ipcMain.on(IPC.UI_TASK_RES, (_, res) => {
+		console.log("Received task response from renderer:", res);
+		// Tutaj możesz obsłużyć odpowiedź od renderer process, np. przekazać ją do WebSocketClient
 	});
 
-	ipcMain.handle("decision-response", (event, data) => {
-		console.log("Otrzymano decyzję od użytkownika:", data);
-		mainWindow.webContents.send("decision-request", {
-			type: "selfSignedCert",
-			payload: {
-				decisionId: "decision-123",
-				wsUuid: "ws-uuid-456",
-				url: "wss://example.com",
-			},
-		});
-		return true;
-	});
+	let a: UiTaskReq<"sslSelfSigned"> = {
+		id: "test-task-1",
+		source: "main-process",
+		type: "sslSelfSigned",
+		payload: { url: "https://example.com" },
+		createdAt: Date.now(),
+	};
 
-	const wsClient = new WebSocketClient();
-
-	wsClient.connect("wss://192.168.1.5:9001", "", "");
+	mainWindow.webContents.send(IPC.UI_TASK_REQ, a);
 
 	//Test();
 });
