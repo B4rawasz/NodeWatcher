@@ -1,53 +1,45 @@
 import { app, BrowserWindow, ipcMain } from "electron";
 import path from "path";
-//import WebSocket from "ws";
-//import crypto from "crypto";
-
+import { IPC } from "@nodewatcher/shared";
 import { getPreloadPath } from "./utils/pathResolver.js";
 import { isDev } from "./utils/utils.js";
-//import WebSocketClient from "./modules/websocket/client.js";
-import { IPC } from "@nodewatcher/shared";
-import type { UiTaskReq } from "@nodewatcher/shared";
 import { UiTaskBroker } from "./modules/task_broker/task_broker.js";
+import { logger } from "./modules/logger/logger.js";
 
-app.on("ready", () => {
+let mainLogger = logger.registerModule("Main");
+
+app.on("ready", async () => {
+	mainLogger.info("Application is starting...");
 	const mainWindow = new BrowserWindow({
 		webPreferences: {
 			preload: getPreloadPath(),
 		},
 	});
-	if (isDev()) {
-		mainWindow.loadURL("http://localhost:5050");
-	} else {
-		mainWindow.loadFile(path.join(app.getAppPath(), "dist-react", "index.html"));
+
+	try {
+		if (isDev()) {
+			await mainWindow.loadURL("http://localhost:5050");
+		} else {
+			await mainWindow.loadFile(path.join(app.getAppPath(), "dist-react", "index.html"));
+		}
+	} catch (error) {
+		const err = error instanceof Error ? error : new Error(String(error));
+		mainLogger.error("Error loading main window content", err);
+		app.quit();
+		return;
 	}
 
-	let a: UiTaskReq<"sslSelfSigned"> = {
-		id: "test-task-1",
-		source: "main-process",
-		type: "sslSelfSigned",
-		payload: { url: "https://example.com" },
-		createdAt: Date.now(),
-	};
+	mainLogger.info("Main window created and content loaded");
 
-	let taskB = new UiTaskBroker((req) => {
+	mainLogger.info("Setting up UI task broker");
+	const taskBroker = UiTaskBroker.getInstance((req) => {
 		mainWindow.webContents.send(IPC.UI_TASK_REQ, req);
 	});
 
+	mainLogger.info("Setting up IPC listeners for UI task responses");
 	ipcMain.on(IPC.UI_TASK_RES, (_, res) => {
-		taskB.handleTaskResponse(res);
+		taskBroker.handleTaskResponse(res);
 	});
-
-	setTimeout(() => {
-		taskB
-			.requestTask(a)
-			.then((res) => {
-				console.log("Received task response in main process:", res);
-			})
-			.catch((err) => {
-				console.error("Error in task request:", err);
-			});
-	}, 2000);
 
 	//Test();
 });

@@ -5,3 +5,7 @@ import { isDev } from "./utils.js";
 export function getPreloadPath() {
 	return path.join(app.getAppPath(), isDev() ? "." : "..", "dist", "preload.cjs");
 }
+
+export function getUserDataPath() {
+	return app.getPath("userData");
+}

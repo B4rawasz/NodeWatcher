@@ -1,5 +1,6 @@
 {
 	"name": "@nodewatcher/electron",
+	"productName": "NodeWatcher",
 	"version": "1.0.0",
 	"description": "Backend service for NodeWatcher",
 	"author": "B4rawasz",
@@ -13,7 +14,10 @@
 	},
 	"dependencies": {
 		"@nodewatcher/shared": "^1.0.0",
+		"chalk": "^4.1.2",
 		"uuid": "^13.0.0",
+		"winston": "^3.19.0",
+		"winston-daily-rotate-file": "^5.0.0",
 		"ws": "^8.19.0"
 	},
 	"devDependencies": {
