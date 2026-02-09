@@ -18,7 +18,7 @@ export interface AnotherTaskTypeRes {
 
 /* ===== MAPS ===== */
 
-export type TaskMap = {
+export type UiTaskMap = {
 	sslSelfSigned: {
 		request: SslSelfSignedReq;
 		response: SslSelfSignedRes;
@@ -30,25 +30,25 @@ export type TaskMap = {
 	};
 };
 
-export type TaskType = keyof TaskMap;
+export type UiTaskType = keyof UiTaskMap;
 
 /* ===== GENERIC TYPES ===== */
 
-export type UiTaskReq<K extends TaskType> = {
+export type UiTaskReq<K extends UiTaskType> = {
 	id: string;
 	source: string;
 	type: K;
-	payload: TaskMap[K]["request"];
+	payload: UiTaskMap[K]["request"];
 	createdAt: number;
 };
 
-export type UiTaskRes<K extends TaskType> = {
+export type UiTaskRes<K extends UiTaskType> = {
 	id: string;
 	type: K;
-	payload: TaskMap[K]["response"];
+	payload: UiTaskMap[K]["response"];
 };
 
 /* ===== DISCRIMINATED UNIONS ===== */
 
-export type AnyUiTaskReq = { [K in TaskType]: UiTaskReq<K> }[TaskType];
-export type AnyUiTaskRes = { [K in TaskType]: UiTaskRes<K> }[TaskType];
+export type AnyUiTaskReq = { [K in UiTaskType]: UiTaskReq<K> }[UiTaskType];
+export type AnyUiTaskRes = { [K in UiTaskType]: UiTaskRes<K> }[UiTaskType];

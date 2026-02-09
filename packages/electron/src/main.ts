@@ -8,6 +8,7 @@ import { isDev } from "./utils/utils.js";
 //import WebSocketClient from "./modules/websocket/client.js";
 import { IPC } from "@nodewatcher/shared";
 import type { UiTaskReq } from "@nodewatcher/shared";
+import { UiTaskBroker } from "./modules/task_broker/task_broker.js";
 
 app.on("ready", () => {
 	const mainWindow = new BrowserWindow({
@@ -21,11 +22,6 @@ app.on("ready", () => {
 		mainWindow.loadFile(path.join(app.getAppPath(), "dist-react", "index.html"));
 	}
 
-	ipcMain.on(IPC.UI_TASK_RES, (_, res) => {
-		console.log("Received task response from renderer:", res);
-		// Tutaj możesz obsłużyć odpowiedź od renderer process, np. przekazać ją do WebSocketClient
-	});
-
 	let a: UiTaskReq<"sslSelfSigned"> = {
 		id: "test-task-1",
 		source: "main-process",
@@ -34,7 +30,24 @@ app.on("ready", () => {
 		createdAt: Date.now(),
 	};
 
-	mainWindow.webContents.send(IPC.UI_TASK_REQ, a);
+	let taskB = new UiTaskBroker((req) => {
+		mainWindow.webContents.send(IPC.UI_TASK_REQ, req);
+	});
+
+	ipcMain.on(IPC.UI_TASK_RES, (_, res) => {
+		taskB.handleTaskResponse(res);
+	});
+
+	setTimeout(() => {
+		taskB
+			.requestTask(a)
+			.then((res) => {
+				console.log("Received task response in main process:", res);
+			})
+			.catch((err) => {
+				console.error("Error in task request:", err);
+			});
+	}, 2000);
 
 	//Test();
 });

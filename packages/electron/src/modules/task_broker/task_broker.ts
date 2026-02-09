@@ -1,0 +1,40 @@
+import type { UiTaskRes, UiTaskReq, UiTaskType } from "@nodewatcher/shared";
+
+export class UiTaskBroker {
+	private pendingTasks = new Map<
+		string,
+		{
+			resolve: (res: UiTaskRes<any>["payload"] | PromiseLike<UiTaskRes<any>["payload"]>) => void;
+			reject: (err: Error) => void;
+			timeout: NodeJS.Timeout;
+		}
+	>();
+	private sendTaskRequest: (req: UiTaskReq<any>) => void;
+
+	constructor(sendTaskRequest: (req: UiTaskReq<any>) => void) {
+		this.sendTaskRequest = sendTaskRequest;
+	}
+
+	requestTask<K extends UiTaskType>(req: UiTaskReq<K>, timeout = 3000): Promise<UiTaskRes<K>["payload"]> {
+		return new Promise((resolve, reject) => {
+			const timeoutId = setTimeout(() => {
+				this.pendingTasks.delete(req.id);
+				reject(new Error("Task timed out"));
+			}, timeout);
+
+			this.pendingTasks.set(req.id, { resolve, reject, timeout: timeoutId });
+			this.sendTaskRequest(req);
+		});
+	}
+
+	handleTaskResponse<K extends UiTaskType>(res: UiTaskRes<K>) {
+		const pending = this.pendingTasks.get(res.id);
+		if (pending) {
+			clearTimeout(pending.timeout);
+			pending.resolve(res.payload);
+			this.pendingTasks.delete(res.id);
+		} else {
+			console.warn(`No pending task found for response with id ${res.id}`);
+		}
+	}
+}
