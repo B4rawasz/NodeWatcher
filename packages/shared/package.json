@@ -1,0 +1,18 @@
+{
+	"name": "@nodewatcher/shared",
+	"version": "1.0.0",
+	"description": "Shared components for NodeWatcher",
+	"license": "MIT",
+	"author": "B4rawasz",
+	"type": "module",
+	"private": true,
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"scripts": {
+		"build": "tsc -b"
+	},
+	"devDependencies": {
+		"@types/node": "^25.2.2",
+		"typescript": "^5.9.3"
+	}
+}

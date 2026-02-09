@@ -1,13 +1,13 @@
 import { app, BrowserWindow, ipcMain } from "electron";
 import path from "path";
-import WebSocket from "ws";
-import crypto from "crypto";
+//import WebSocket from "ws";
+//import crypto from "crypto";
 
 import { getPreloadPath } from "./utils/pathResolver.js";
 import { isDev } from "./utils/utils.js";
-import WebSocketClient from "./modules/websocket/client.js";
-import { IPC } from "../shared/ipc.js";
-import { UiTaskReq } from "../shared/tasks.js";
+//import WebSocketClient from "./modules/websocket/client.js";
+import { IPC } from "@nodewatcher/shared";
+import type { UiTaskReq } from "@nodewatcher/shared";
 
 app.on("ready", () => {
 	const mainWindow = new BrowserWindow({
@@ -45,7 +45,7 @@ app.on("window-all-closed", () => {
 	}
 });
 
-async function Test() {
+/*async function Test() {
 	let ws: WebSocket | null = null;
 	let notifiedSelfSigned = false;
 
@@ -95,4 +95,4 @@ async function Test() {
 function notifyUserSelfSignedCert() {
 	// Tu możesz wysłać powiadomienie do renderer process przez IPC
 	console.log("Uwaga: Połączenie używa self-signed certificate!");
-}
+}*/

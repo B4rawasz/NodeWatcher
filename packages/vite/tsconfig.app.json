@@ -26,9 +26,8 @@
 
 		"baseUrl": ".",
 		"paths": {
-			"@/*": ["./src/ui/*"]
+			"@/*": ["./src/*"]
 		}
 	},
-	"include": ["src"],
-	"exclude": ["src/electron"]
+	"include": ["src"]
 }

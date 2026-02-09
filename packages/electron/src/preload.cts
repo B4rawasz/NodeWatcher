@@ -1,6 +1,12 @@
 import { contextBridge, ipcRenderer } from "electron";
-import { AnyUiTaskReq, AnyUiTaskRes } from "../shared/tasks";
-import { IPC } from "../shared/ipc";
+import type { AnyUiTaskReq, AnyUiTaskRes } from "@nodewatcher/shared";
+//import { IPC } from "@nodewatcher/shared";
+
+// Cant import IPC becouse chromium runtime cant resolve it, so we need to redefine it here
+const IPC = {
+	UI_TASK_REQ: "ui-task-req",
+	UI_TASK_RES: "ui-task-res",
+} as const;
 
 contextBridge.exposeInMainWorld("electron", {
 	onTask: (callback: (req: AnyUiTaskReq) => void) =>

@@ -8,7 +8,7 @@ export default defineConfig({
 	plugins: [react(), tailwindcss()],
 	base: "./",
 	build: {
-		outDir: "dist-react",
+		outDir: "./dist",
 	},
 	server: {
 		port: 5050,
@@ -16,7 +16,7 @@ export default defineConfig({
 	},
 	resolve: {
 		alias: {
-			"@": path.resolve(__dirname, "src", "ui"),
+			"@": path.resolve(__dirname, "src"),
 		},
 	},
 });

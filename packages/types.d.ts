@@ -1,5 +1,3 @@
-import type { AnyUiTaskReq, AnyUiTaskRes } from "./shared/tasks";
-
 namespace messages {
 	enum MessageType {
 		UNKNOWN = "UNKNOWN",
@@ -74,12 +72,4 @@ namespace messages {
 	}
 }
 
-declare global {
-	interface Window {
-		electron: {
-			onTask(callback: (req: AnyUiTaskReq) => void): void;
-			sendTaskResponse(res: AnyUiTaskRes): void;
-		};
-	}
-}
 export {};
