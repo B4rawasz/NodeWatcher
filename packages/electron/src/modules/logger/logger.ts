@@ -94,7 +94,7 @@ class Logger {
 	}
 }
 
-class LoggerInstance {
+export class LoggerInstance {
 	private logger: winston.Logger;
 	private module: string;
 
