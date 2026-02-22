@@ -5,6 +5,7 @@ import { getPreloadPath } from "./utils/pathResolver.js";
 import { isDev } from "./utils/utils.js";
 import { UiTaskBroker } from "./modules/task_broker/task_broker.js";
 import { logger } from "./modules/logger/logger.js";
+import { WebSocketManager } from "./modules/websocket/manager.js";
 
 let mainLogger = logger.registerModule("Main");
 
@@ -40,6 +41,19 @@ app.on("ready", async () => {
 	ipcMain.on(IPC.UI_TASK_RES, (_, res) => {
 		taskBroker.handleTaskResponse(res);
 	});
+
+	mainLogger.info("Initializing WebSocket manager");
+	const socketManager = new WebSocketManager(
+		(stats) => {
+			mainWindow.webContents.send(IPC.WEBSOCKET_STATS, stats);
+		},
+		(notification) => {
+			mainWindow.webContents.send(IPC.WEBSOCKET_NOTIFICATION, notification);
+		},
+	);
+
+	mainLogger.info("Creating test WebSocket client");
+	socketManager.create("wss://192.168.1.5:9001", "test", "test", "Test Connection");
 
 	//Test();
 });
